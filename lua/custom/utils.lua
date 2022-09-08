@@ -1,10 +1,10 @@
 local M = {}
 
 -- Toogle diagnostics
-local diagnostics_active = true
+vim.g.diagnostics_active = true
 M.toggle_diagnostics = function()
-  diagnostics_active = not diagnostics_active
-  if diagnostics_active then
+  vim.g.diagnostics_active = not vim.g.diagnostics_active
+  if vim.g.diagnostics_active then
     vim.api.nvim_echo({ { "Show diagnostics" } }, false, {})
     vim.diagnostic.enable()
   else

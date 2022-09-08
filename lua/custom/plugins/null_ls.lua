@@ -9,8 +9,10 @@ local b = null_ls.builtins
 local sources = {
 
   -- webdev stuff
-  -- b.formatting.deno_fmt,
-  -- b.formatting.prettier,
+  b.formatting.deno_fmt,
+  b.formatting.prettier,
+
+  b.formatting.eslint,
 
   -- Lua
   b.formatting.stylua,
@@ -20,6 +22,8 @@ local sources = {
   b.diagnostics.shellcheck.with { diagnostics_format = "#{m} [#{c}]" },
 
   -- Rust
+  -- b.formatting.rustfmt, -- not work
+  -- works
   b.formatting.rustfmt.with {
     extra_args = function(params)
       print "formatting rustfmt"

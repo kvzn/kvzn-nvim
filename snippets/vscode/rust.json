@@ -1,0 +1,112 @@
+{
+  "sqlx create uuid": {
+    "prefix": "sqlx_create_uuid",
+    "description": "sqlx create returning uuid implementation",
+    "body": [
+      "let query = sqlx::query_as::<_, (Uuid,)>(",
+      "      \"INSERT INTO ${1:table_name} (${2:field_name}, create_time, update_time) \\",
+      "      VALUES ($${3:index}, NOW(), NOW()) RETURNING id\",",
+      "  )",
+      "      .bind(${4:bind_value});",
+      "",
+      "execute!(pool_or_transaction, query, fetch_one)",
+      "      .map(|r| r.0)",
+      "      .map_err(AppError::from)"
+    ]
+  },
+  "sqlx update": {
+    "prefix": "sqlx_update",
+    "description": "sqlx update implementation",
+    "body": [
+      "let query = sqlx::query(\"UPDATE ${1:table_name} SET ${2:field_name} = $1, update_time = NOW() WHERE ${3:field_name} = $1\")",
+      "      .bind(${4:bind_value});",
+      "",
+      "execute_one_row_affected!(pool_or_transaction, query)"
+    ]
+  },
+  "sqlx find one": {
+    "prefix": "sqlx_find_one",
+    "description": "sqlx find one implementation",
+    "body": [
+      "let query =",
+      "            sqlx::query_as::<_,${1:Object}>(\"SELECT * FROM ${2:table_name} WHERE ${3:field_name} = $1\").bind(${4:bind_value});",
+      "",
+      "execute!(pool_or_transaction, query, fetch_optional)"
+    ]
+  },
+  "sqlx find all vec": {
+    "prefix": "sqlx_find_all_vec",
+    "description": "sqlx find all returning vec implementation",
+    "body": [
+      "let query = sqlx::query_as::<_, ${1:Object}>(\"SELECT * FROM ${2:table_name} WHERE ${3:field_name} = $1\").bind(${4:bind_value});",
+      "",
+      "execute!(pool_or_transaction, query, fetch_all)"
+    ]
+  },
+  "sqlx find all page": {
+    "prefix": "sqlx_find_all_page",
+    "description": "sqlx find all returning page result implementation",
+    "body": [
+      "",
+      "let sql_target = \"FROM ${1:table_name} WHERE ${2:field_name} = $1\";",
+      "",
+      "let query_items = sqlx::query_as::<_,${3:Object}>(format!(\"SELECT * {} LIMIT $${4:index} OFFSET $${5:index}\", sql_target))",
+      "        .bind(${6:bind_value})",
+      "        .bind(page.limit)",
+      "        .bind(page.offset - 1);",
+      "",
+      "let query_total = sqlx::query_as::<_, (i64,)>(format!(\"SELECT COUNT(*) as count {}\", sqlx_target));",
+      "",
+      "execute_for_items_and_total!(pool_or_transaction, query_items, query_total)"
+    ]
+  },
+  "sqlx exists": {
+    "prefix": "sqlx_exists",
+    "description": "sqlx exists implementation",
+    "body": [
+      "let query =",
+      "            sqlx::query_as::<_, (i64,)>(\"SELECT COUNT(*) FROM${1:table_name} WHERE ${2:field_name} = $1\")",
+      "        .bind(${3:bind_value});",
+      "",
+      "execute_exists!(pool_or_transaction, query)"
+    ]
+  },
+  "sqlx count": {
+    "prefix": "sqlx_count",
+    "description": "sqlx count implementation",
+    "body": [
+      "let query = sqlx::query_as::<_, (i64,)>(\"SELECT COUNT(*) as count FROM ${1:table_name} WHERE ${2:field_name} = $1\").bind(${3:bind_value});",
+      "",
+      "execute_for_count!(pool_or_transaction, query)"
+    ]
+  },
+  "sqlx soft delete": {
+    "prefix": "sqlx_soft_delete",
+    "description": "sqlx soft delete implementation",
+    "body": [
+      "let query =",
+      "            sqlx::query(\"UPDATE${1:table_name} SET deleted = true, delete_time = NOW() WHERE deleted = false AND id = $1\")",
+      "        .bind(id);",
+      "",
+      "execute_one_row_affected!(pool_or_transaction, query)"
+    ]
+  },
+  "sqlx hard delete one row": {
+    "prefix": "sqlx_hard_delete_one_row",
+    "description": "sqlx hard delete one row implementation",
+    "body": [
+      "let query = sqlx::query(\"DELETE FROM ${1:table_name} WHERE ${2:field_name} = $1\").bind(&${3:bind_value});",
+      "",
+      "execute_one_row_affected!(pool_or_transaction, query)"
+    ]
+  },
+  "sqlx hard delete uncertain rows": {
+    "prefix": "sqlx_hard_delete_uncertain_rows",
+    "description": "sqlx hard delete uncertain rows implementation",
+    "body": [
+      "let query = sqlx::query(\"DELETE FROM ${1:table_name} WHERE ${2:field_name} = $1\").bind(${3:bind_value});",
+      "",
+      "execute_uncertain_rows_affected!(pool_or_transaction, query)"
+    ]
+  }
+}

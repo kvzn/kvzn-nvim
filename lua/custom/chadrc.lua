@@ -26,6 +26,7 @@ M.plugins = {
         "typescript-language-server",
         "emmet-ls",
         "json-lsp",
+        "deno",
 
         -- shell
         "shfmt",

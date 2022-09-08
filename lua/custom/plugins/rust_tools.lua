@@ -22,7 +22,7 @@ local opts = {
       ["rust-analyzer"] = {
         -- enable clippy on save
         checkOnSave = {
-          command = "check",
+          command = "clippy",
         },
       },
     },
