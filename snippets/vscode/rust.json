@@ -3,10 +3,7 @@
     "prefix": "sqlx_create_uuid",
     "description": "sqlx create returning uuid implementation",
     "body": [
-      "let query = sqlx::query_as::<_, (Uuid,)>(",
-      "      \"INSERT INTO ${1:table_name} (${2:field_name}, create_time, update_time) \\",
-      "      VALUES ($${3:index}, NOW(), NOW()) RETURNING id\",",
-      "  )",
+      "let query = sqlx::query_as::<_, (Uuid,)>(\"INSERT INTO ${1:table_name} (${2:field_name}, create_time, update_time) VALUES ($${3:index}, NOW(), NOW()) RETURNING id\")",
       "      .bind(${4:bind_value});",
       "",
       "execute!(pool_or_transaction, query, fetch_one)",
@@ -18,8 +15,8 @@
     "prefix": "sqlx_update",
     "description": "sqlx update implementation",
     "body": [
-      "let query = sqlx::query(\"UPDATE ${1:table_name} SET ${2:field_name} = $1, update_time = NOW() WHERE ${3:field_name} = $1\")",
-      "      .bind(${4:bind_value});",
+      "let query = sqlx::query(\"UPDATE ${1:table_name} SET ${2:field_name} = \\$${3:index}, update_time = NOW() WHERE ${4:field_name} = \\$${5:index}\")",
+      "      .bind(${5:bind_value});",
       "",
       "execute_one_row_affected!(pool_or_transaction, query)"
     ]
@@ -29,7 +26,7 @@
     "description": "sqlx find one implementation",
     "body": [
       "let query =",
-      "            sqlx::query_as::<_,${1:Object}>(\"SELECT * FROM ${2:table_name} WHERE ${3:field_name} = $1\").bind(${4:bind_value});",
+      "            sqlx::query_as::<_,${1:Object}>(\"SELECT * FROM ${2:table_name} WHERE ${3:field_name} = \\$${4:index}\").bind(${5:bind_value});",
       "",
       "execute!(pool_or_transaction, query, fetch_optional)"
     ]
@@ -38,7 +35,7 @@
     "prefix": "sqlx_find_all_vec",
     "description": "sqlx find all returning vec implementation",
     "body": [
-      "let query = sqlx::query_as::<_, ${1:Object}>(\"SELECT * FROM ${2:table_name} WHERE ${3:field_name} = $1\").bind(${4:bind_value});",
+      "let query = sqlx::query_as::<_, ${1:Object}>(\"SELECT * FROM ${2:table_name} WHERE ${3:field_name} = \\$${4:index}\").bind(${5:bind_value});",
       "",
       "execute!(pool_or_transaction, query, fetch_all)"
     ]
@@ -48,10 +45,10 @@
     "description": "sqlx find all returning page result implementation",
     "body": [
       "",
-      "let sql_target = \"FROM ${1:table_name} WHERE ${2:field_name} = $1\";",
+      "let sql_target = \"FROM ${1:table_name} WHERE ${2:field_name} = \\$${3:index}\";",
       "",
-      "let query_items = sqlx::query_as::<_,${3:Object}>(format!(\"SELECT * {} LIMIT $${4:index} OFFSET $${5:index}\", sql_target))",
-      "        .bind(${6:bind_value})",
+      "let query_items = sqlx::query_as::<_,${4:Object}>(format!(\"SELECT * {} LIMIT $${5:index} OFFSET $${6:index}\", sql_target))",
+      "        .bind(${7:bind_value})",
       "        .bind(page.limit)",
       "        .bind(page.offset - 1);",
       "",
@@ -65,8 +62,8 @@
     "description": "sqlx exists implementation",
     "body": [
       "let query =",
-      "            sqlx::query_as::<_, (i64,)>(\"SELECT COUNT(*) FROM${1:table_name} WHERE ${2:field_name} = $1\")",
-      "        .bind(${3:bind_value});",
+      "            sqlx::query_as::<_, (i64,)>(\"SELECT COUNT(*) FROM ${1:table_name} WHERE ${2:field_name} = \\$${3:index}\")",
+      "        .bind(${4:bind_value});",
       "",
       "execute_exists!(pool_or_transaction, query)"
     ]
@@ -75,7 +72,7 @@
     "prefix": "sqlx_count",
     "description": "sqlx count implementation",
     "body": [
-      "let query = sqlx::query_as::<_, (i64,)>(\"SELECT COUNT(*) as count FROM ${1:table_name} WHERE ${2:field_name} = $1\").bind(${3:bind_value});",
+      "let query = sqlx::query_as::<_, (i64,)>(\"SELECT COUNT(*) as count FROM ${1:table_name} WHERE ${2:field_name} = \\$${3:index}\").bind(${4:bind_value});",
       "",
       "execute_for_count!(pool_or_transaction, query)"
     ]
@@ -84,8 +81,7 @@
     "prefix": "sqlx_soft_delete",
     "description": "sqlx soft delete implementation",
     "body": [
-      "let query =",
-      "            sqlx::query(\"UPDATE${1:table_name} SET deleted = true, delete_time = NOW() WHERE deleted = false AND id = $1\")",
+      "let query = sqlx::query(\"UPDATE ${1:table_name} SET deleted = true, delete_time = NOW() WHERE deleted = false AND id = \\$${2:index}\")",
       "        .bind(id);",
       "",
       "execute_one_row_affected!(pool_or_transaction, query)"
@@ -95,7 +91,7 @@
     "prefix": "sqlx_hard_delete_one_row",
     "description": "sqlx hard delete one row implementation",
     "body": [
-      "let query = sqlx::query(\"DELETE FROM ${1:table_name} WHERE ${2:field_name} = $1\").bind(&${3:bind_value});",
+      "let query = sqlx::query(\"DELETE FROM ${1:table_name} WHERE ${2:field_name} = \\$${3:index}\").bind(${4:bind_value});",
       "",
       "execute_one_row_affected!(pool_or_transaction, query)"
     ]
@@ -104,7 +100,7 @@
     "prefix": "sqlx_hard_delete_uncertain_rows",
     "description": "sqlx hard delete uncertain rows implementation",
     "body": [
-      "let query = sqlx::query(\"DELETE FROM ${1:table_name} WHERE ${2:field_name} = $1\").bind(${3:bind_value});",
+      "let query = sqlx::query(\"DELETE FROM ${1:table_name} WHERE ${2:field_name} = \\$${3:index}\").bind(${4:bind_value});",
       "",
       "execute_uncertain_rows_affected!(pool_or_transaction, query)"
     ]
