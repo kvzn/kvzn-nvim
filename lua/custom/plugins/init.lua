@@ -14,12 +14,12 @@ return {
     end,
   },
 
-  -- ["simrat39/rust-tools.nvim"] = {
-  --   after = "nvim-lspconfig",
-  --   config = function()
-  --     require "custom.plugins.rust_tools"
-  --   end,
-  -- },
+  ["simrat39/rust-tools.nvim"] = {
+    after = "nvim-lspconfig",
+    config = function()
+      require "custom.plugins.rust_tools"
+    end,
+  },
 
   -- ["neoclide/coc.nvim"] = {
   --  branch = "release",
@@ -27,8 +27,8 @@ return {
 
   ["folke/which-key.nvim"] = { disable = false },
 
-  ["lvimuser/lsp-inlayhints.nvim"] = {
-    after = "nvim-lspconfig",
-    config = function() end,
-  },
+  -- ["lvimuser/lsp-inlayhints.nvim"] = {
+  --   after = "nvim-lspconfig",
+  --   config = function() end,
+  -- },
 }
