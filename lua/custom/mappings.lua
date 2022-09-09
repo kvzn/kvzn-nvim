@@ -1,5 +1,11 @@
 local M = {}
 
+-- M.general = {
+-- i = {
+-- ["<C-]>"] = { "<Esc>", "Esc" },
+-- },
+-- }
+
 M.lspconfig = {
   plugin = true,
 
