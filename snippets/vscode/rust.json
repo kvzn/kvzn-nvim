@@ -21,6 +21,26 @@
       "      .map_err(AppError::from)"
     ]
   },
+  "sqlx create in batch": {
+    "prefix": "sqlx_create_batch",
+    "description": "sqlx create in batch implementation",
+    "body": [
+      "let mut query_builder: QueryBuilder<Postgres> = QueryBuilder::new(",
+      "    \"INSERT INTO ${1:table_name} (${2:field_name}, ${3:field_name}, create_time, update_time) \"",
+      ");",
+      "",
+      "query_builder.push_values(inputs, |mut b, input| {",
+      "    b.push_bind(&input.${4:field_name})",
+      "        .push_bind(&input.${5:field_name})",
+      "        .push_bind(Utc::now())",
+      "        .push_bind(Utc::now());",
+      "});",
+      "",
+      "let query = query_builder.build();",
+      "",
+      "execute_uncertain_rows_affected!(pool_or_transaction, query)"
+    ]
+  },
   "sqlx update": {
     "prefix": "sqlx_update",
     "description": "sqlx update implementation",
